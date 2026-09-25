@@ -1,0 +1,187 @@
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/jetbrains-mono';
+@import '@fontsource-variable/source-serif-4/opsz.css';
+@import '@fontsource-variable/source-serif-4/opsz-italic.css';
+@import 'tailwindcss';
+
+/*
+ * DESIGN TOKENS: the single place to change the look of the case study.
+ * Components use these via Tailwind utilities (bg-canvas, text-ink-muted, border-border, ...).
+ * Never hardcode hex values in components.
+ */
+@theme {
+  /* Color: surfaces (warm ivory) */
+  --color-canvas: #faf6f1;
+  --color-surface: #ffffff;
+  --color-surface-subtle: #f4eee7;
+  --color-surface-sunken: #ece4da;
+
+  /* Color: lines */
+  --color-border: #e8dfd4;
+  --color-border-strong: #d6cabb;
+
+  /* Color: text (deep navy) */
+  --color-ink: #171f38;
+  --color-ink-muted: #4d5470;
+  --color-ink-subtle: #626780;
+  --color-ink-inverse: #ffffff;
+
+  /* Color: the single accent (muted burgundy) */
+  --color-accent: #7a1f3d;
+  --color-accent-strong: #62172f;
+  --color-accent-soft: #f7e9ec;
+  --color-accent-border: #e6c4cc;
+
+  /* Color: semantic tones. Use sparingly (review decisions, confidence, status) */
+  --color-success: #166534;
+  --color-success-soft: #e8f5ec;
+  --color-success-border: #b7dfc3;
+  --color-warning: #8a5a00;
+  --color-warning-soft: #fcf3dc;
+  --color-warning-border: #ebd48f;
+  --color-danger: #b3261e;
+  --color-danger-soft: #fdeceb;
+  --color-danger-border: #f4bdb8;
+  --color-info: #1e5a8a;
+  --color-info-soft: #e7f1f9;
+  --color-info-border: #b5d3ea;
+
+  /* Typography */
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-serif: 'Source Serif 4 Variable', ui-serif, Georgia, 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --text-display: clamp(2.25rem, 1.4rem + 3.6vw, 3.75rem);
+  --text-display--line-height: 1.05;
+  --text-display--letter-spacing: -0.03em;
+  --text-display--font-weight: 500;
+
+  --text-h1: clamp(2rem, 1.2rem + 2.8vw, 3.25rem);
+  --text-h1--line-height: 1.1;
+  --text-h1--letter-spacing: -0.025em;
+  --text-h1--font-weight: 500;
+
+  --text-h2: clamp(1.5rem, 1.2rem + 1.2vw, 2rem);
+  --text-h2--line-height: 1.2;
+  --text-h2--letter-spacing: -0.015em;
+  --text-h2--font-weight: 500;
+
+  --text-h3: 1.25rem;
+  --text-h3--line-height: 1.3;
+  --text-h3--letter-spacing: -0.005em;
+  --text-h3--font-weight: 600;
+
+  --text-lead: clamp(1.0625rem, 1rem + 0.35vw, 1.25rem);
+  --text-lead--line-height: 1.55;
+
+  --text-body: 1rem;
+  --text-body--line-height: 1.6;
+
+  --text-small: 0.875rem;
+  --text-small--line-height: 1.5;
+
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1.4;
+
+  --text-overline: 0.6875rem;
+  --text-overline--line-height: 1.2;
+  --text-overline--letter-spacing: 0.1em;
+  --text-overline--font-weight: 600;
+
+  /* Shape */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+
+  /* Elevation: hairline borders are the primary structure device, shadows are secondary */
+  --shadow-card: 0 1px 2px rgb(22 21 26 / 0.04), 0 1px 1px rgb(22 21 26 / 0.03);
+  --shadow-raised: 0 12px 28px -12px rgb(22 21 26 / 0.16), 0 2px 6px rgb(22 21 26 / 0.05);
+
+  /* Layout */
+  --container-page: 72rem;
+
+  /* Motion: subtle and purposeful */
+  --ease-soft: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --animate-rise: rise 0.5s var(--ease-soft) both;
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/*
+ * Dark theme is intentionally NOT active. To add it later, override the color tokens above
+ * under :root[data-theme='dark'] { --color-canvas: ...; --color-surface: ...; ... }
+ * and set data-theme="dark" on <html>. Components already use tokens only.
+ */
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: 'cv11', 'ss01';
+    /* keeps anchor targets clear of the sticky header */
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    min-height: 100dvh;
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+  }
+
+  /* Editorial headings: serif. An <em> inside a heading is the accent-colored italic emphasis word. */
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-serif);
+  }
+
+  h1 em,
+  h2 em {
+    font-style: italic;
+    color: var(--color-accent);
+  }
+
+  ::selection {
+    background-color: var(--color-accent-soft);
+    color: var(--color-accent-strong);
+  }
+
+  /* One focus style for the whole product */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  /* <main> receives programmatic focus on route change; do not draw a ring around the whole page */
+  main:focus {
+    outline: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      animation-delay: 0ms !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
