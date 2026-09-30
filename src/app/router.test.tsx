@@ -28,7 +28,7 @@ describe('routing', () => {
   // necessarily contain the nav title verbatim - just assert an h1 renders. Placeholder pages
   // still render `section.title` as their h1, so match it by regex (a page may prefix its own
   // numbering, e.g. "1. Understanding the Problem").
-  const CUSTOM_HEADING_SECTIONS: readonly string[] = ['problem', 'ai-opportunity', 'prototype']
+  const CUSTOM_HEADING_SECTIONS: readonly string[] = ['problem', 'ai-opportunity', 'prototype', 'evaluation']
   it.each(SECTIONS.map((s) => [s.id, s.path, s.title] as const))('renders %s', async (id, path, title) => {
     renderAt(path)
     if (CUSTOM_HEADING_SECTIONS.includes(id)) {
@@ -73,7 +73,7 @@ describe('routing', () => {
     }
 
     await user.click(within(nav).getByRole('link', { name: /evaluation/i }))
-    await screen.findByRole('heading', { level: 1, name: /Evaluation & Safety/ })
+    await screen.findByRole('heading', { level: 1, name: /measurable/i })
     expect(within(desktopNav()).getByRole('link', { name: /evaluation/i })).toHaveAttribute('aria-current', 'page')
     expect(screen.getByRole('main')).toHaveFocus()
   })
