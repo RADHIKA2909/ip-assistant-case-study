@@ -24,12 +24,20 @@ describe('routing', () => {
     expect(await screen.findByRole('heading', { level: 1, name: /shows its evidence/i })).toBeInTheDocument()
   })
 
-  // Match by regex: a page may prefix its own numbering, e.g. "1. Understanding the Problem".
-  it.each(SECTIONS.map((s) => [s.path, s.title] as const))('renders %s', async (path, title) => {
+  // Pages with their own editorial H1 copy (checked exactly in their own test file) don't
+  // necessarily contain the nav title verbatim - just assert an h1 renders. Placeholder pages
+  // still render `section.title` as their h1, so match it by regex (a page may prefix its own
+  // numbering, e.g. "1. Understanding the Problem").
+  const CUSTOM_HEADING_SECTIONS: readonly string[] = ['problem', 'ai-opportunity']
+  it.each(SECTIONS.map((s) => [s.id, s.path, s.title] as const))('renders %s', async (id, path, title) => {
     renderAt(path)
-    expect(
-      await screen.findByRole('heading', { level: 1, name: new RegExp(title) }),
-    ).toBeInTheDocument()
+    if (CUSTOM_HEADING_SECTIONS.includes(id)) {
+      expect(await screen.findByRole('heading', { level: 1 })).toBeInTheDocument()
+    } else {
+      expect(
+        await screen.findByRole('heading', { level: 1, name: new RegExp(title) }),
+      ).toBeInTheDocument()
+    }
   })
 
   it('renders a not-found page for unknown paths, inside the app shell', async () => {
@@ -94,7 +102,7 @@ describe('routing', () => {
 
   it('offers previous and next links generated from SECTIONS', async () => {
     renderAt('/ai-opportunity')
-    await screen.findByRole('heading', { level: 1, name: /AI Product Opportunity/ })
+    await screen.findByRole('heading', { level: 1, name: /information overload/i })
     const pager = screen.getByRole('navigation', { name: 'Case study pages' })
     expect(within(pager).getByRole('link', { name: /Understanding the Problem/ })).toHaveAttribute('href', '/problem')
     expect(within(pager).getByRole('link', { name: /Interactive AI Product Experience/ })).toHaveAttribute(

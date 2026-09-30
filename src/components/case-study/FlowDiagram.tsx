@@ -7,6 +7,8 @@ export interface FlowNode {
   id: string
   label: string
   description?: string
+  /** Small mono technical label under the description, e.g. "Embeddings + semantic search". Horizontal mode only. */
+  caption?: string
   tone?: Tone
 }
 
@@ -53,6 +55,9 @@ export function FlowDiagram({ nodes, direction = 'vertical', label, className }:
               <p className="text-small font-semibold text-ink">{node.label}</p>
               {node.description && (
                 <p className="mt-1 text-caption text-ink-muted">{node.description}</p>
+              )}
+              {node.caption && (
+                <p className="mt-1.5 font-mono text-caption text-ink-subtle">{node.caption}</p>
               )}
               {!last && (
                 <>
