@@ -48,6 +48,8 @@ export type PatentDocument = Illustrative<{
 export type RetrievedSource = Illustrative<{
   id: string
   label: string
+  /** What kind of material this is, e.g. "Patent Claim", "Prior Art Document", "Prosecution History" */
+  category: string
   /** Where in the document, e.g. "Claim 1" */
   location: string
   excerpt: string

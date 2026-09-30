@@ -1,0 +1,162 @@
+import { act, fireEvent, render, screen, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { createMemoryRouter, RouterProvider } from 'react-router'
+import { routes } from '@/app/router'
+import { REJECT_REASONS } from '@/prototype/content'
+import { PIPELINE_STAGES } from '@/prototype/types'
+import { STAGE_DURATION_MS } from '@/prototype/usePipelineRunner'
+
+function renderPrototype() {
+  const router = createMemoryRouter(routes, { initialEntries: ['/prototype'] })
+  render(<RouterProvider router={router} />)
+  return router
+}
+
+/** Select the document and run the simulated pipeline to completion under fake timers. */
+async function analyze() {
+  await screen.findByRole('heading', { level: 1 })
+  vi.useFakeTimers()
+  fireEvent.click(screen.getByRole('button', { name: /analyze this document/i }))
+  for (const stage of PIPELINE_STAGES) {
+    act(() => {
+      vi.advanceTimersByTime(STAGE_DURATION_MS[stage])
+    })
+  }
+  vi.useRealTimers()
+}
+
+describe('Prototype page', () => {
+  it('has the eyebrow, title, lead and interactive-prototype badge', async () => {
+    renderPrototype()
+    await screen.findByRole('heading', { level: 1 })
+    expect(screen.getByText('03 — Product Experience')).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'From complex documents to expert-validated output.' }),
+    ).toBeInTheDocument()
+    expect(screen.getByText('Interactive Prototype')).toBeInTheDocument()
+  })
+
+  it('starts with an empty state and reveals the workspace after analysis', async () => {
+    renderPrototype()
+    await screen.findByRole('heading', { level: 1 })
+    expect(screen.getByRole('button', { name: /analyze this document/i })).toBeInTheDocument()
+
+    await analyze()
+
+    expect(screen.queryByRole('button', { name: /analyze this document/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2, name: 'Draft Response' })).toBeInTheDocument()
+    expect(screen.getByText('Relevant evidence')).toBeInTheDocument()
+    // The expert "opens" review as soon as the draft is in front of them (see Prototype.tsx),
+    // so the status badge reads "In expert review" here, not the transient "Draft ready".
+    expect(screen.getAllByText('In expert review').length).toBeGreaterThan(0)
+  })
+
+  it('opens the source drawer from evidence, shows all three sources, and closes on Escape', async () => {
+    const user = userEvent.setup()
+    renderPrototype()
+    await analyze()
+
+    await user.click(screen.getByRole('button', { name: /view sources/i }))
+    const drawer = screen.getByRole('dialog', { name: /view sources/i })
+    expect(within(drawer).getByText('Patent Claim')).toBeInTheDocument()
+    expect(within(drawer).getByText('Prior Art Document')).toBeInTheDocument()
+    expect(within(drawer).getByText('Prosecution History')).toBeInTheDocument()
+
+    await user.keyboard('{Escape}')
+    expect(screen.queryByRole('dialog', { name: /view sources/i })).not.toBeInTheDocument()
+  })
+
+  it('clicking a document highlight opens the drawer scoped to that source', async () => {
+    const user = userEvent.setup()
+    renderPrototype()
+    await analyze()
+
+    // The document panel highlights the claim language as a clickable span.
+    const highlight = screen.getByRole('button', { name: /wearable sensor patch comprising/i })
+    await user.click(highlight)
+
+    const drawer = await screen.findByRole('dialog', { name: /view sources/i })
+    expect(within(drawer).getByText('Claim 1 (as filed)')).toBeInTheDocument()
+  })
+
+  it('lets the expert edit a section, then approve with edits applied', async () => {
+    const user = userEvent.setup()
+    renderPrototype()
+    await analyze()
+
+    await user.click(screen.getByRole('button', { name: /^edit$/i }))
+    const textarea = screen.getByRole('textbox', { name: /Response to the obviousness rejection/i })
+    await user.clear(textarea)
+    await user.type(textarea, 'Expert-rewritten response text.')
+    expect(screen.getByDisplayValue('Expert-rewritten response text.')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: /done editing/i }))
+    await user.click(screen.getByRole('button', { name: /^approve$/i }))
+
+    // The status shows both in the top-bar badge and the decision banner title - that's intentional.
+    expect(screen.getAllByText('Approved with edits').length).toBeGreaterThanOrEqual(2)
+    expect(screen.getByText(/approved with your edits applied/i)).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^approve$/i })).not.toBeInTheDocument()
+  })
+
+  it('approving without edits shows plain approval, not "with edits"', async () => {
+    renderPrototype()
+    await analyze()
+    fireEvent.click(screen.getByRole('button', { name: /^approve$/i }))
+    expect(screen.getAllByText(/^Approved$/).length).toBeGreaterThanOrEqual(2)
+    expect(screen.getByText(/approved as generated by the ai/i)).toBeInTheDocument()
+  })
+
+  it('rejecting requires a reason and shows a captured-feedback confirmation', async () => {
+    const user = userEvent.setup()
+    renderPrototype()
+    await analyze()
+
+    await user.click(screen.getByRole('button', { name: /^reject$/i }))
+    expect(screen.getByText('What needs improvement?')).toBeInTheDocument()
+
+    // Submit is disabled until a reason is chosen.
+    expect(screen.getByRole('button', { name: /submit feedback/i })).toBeDisabled()
+
+    const reason = REJECT_REASONS[1]! // "Missing evidence"
+    await user.click(screen.getByRole('radio', { name: reason.label }))
+    await user.click(screen.getByRole('button', { name: /submit feedback/i }))
+
+    expect(screen.getAllByText('Rejected').length).toBeGreaterThanOrEqual(2)
+    expect(screen.getByText(new RegExp(`feedback captured.*${reason.label}`, 'i'))).toBeInTheDocument()
+    expect(screen.queryByText('What needs improvement?')).not.toBeInTheDocument()
+  })
+
+  it('choosing "Other" requires custom text before submitting', async () => {
+    const user = userEvent.setup()
+    renderPrototype()
+    await analyze()
+
+    await user.click(screen.getByRole('button', { name: /^reject$/i }))
+    await user.click(screen.getByRole('radio', { name: 'Other' }))
+    expect(screen.getByRole('button', { name: /submit feedback/i })).toBeDisabled()
+
+    await user.type(screen.getByPlaceholderText(/say more/i), 'Needs a second citation.')
+    expect(screen.getByRole('button', { name: /submit feedback/i })).toBeEnabled()
+    await user.click(screen.getByRole('button', { name: /submit feedback/i }))
+    expect(screen.getByText(/needs a second citation/i)).toBeInTheDocument()
+  })
+
+  it('shows the illustrative quality panel with every number tagged Illustrative', async () => {
+    renderPrototype()
+    await analyze()
+    expect(screen.getByText('Groundedness')).toBeInTheDocument()
+    expect(screen.getByText('92%')).toBeInTheDocument()
+    expect(screen.getByText('Source coverage')).toBeInTheDocument()
+    expect(screen.getAllByText('Illustrative').length).toBeGreaterThanOrEqual(3)
+  })
+
+  it('shows a "Saved" acknowledgement without claiming real persistence', async () => {
+    const user = userEvent.setup()
+    renderPrototype()
+    await screen.findByRole('heading', { level: 1 })
+    await user.click(screen.getByRole('button', { name: /^save$/i }))
+    expect(screen.getByText(/saved/i)).toBeInTheDocument()
+    expect(screen.getByText(/this prototype keeps no data/i)).toBeInTheDocument()
+  })
+})

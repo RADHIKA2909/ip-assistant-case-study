@@ -33,7 +33,7 @@ Single source of truth: `SECTIONS` in `src/content/site.ts`. Header nav, Home in
 | `/` | Home: hero, core story, section index | `src/pages/Home.tsx` | Provisional (functional, may be redesigned on request) |
 | `/problem` | 01 Understanding the Problem | `src/pages/Problem.tsx` (content: `src/content/problem.ts`) | **Done** |
 | `/ai-opportunity` | 02 AI Product Opportunity | `src/pages/AiOpportunity.tsx` (content: `src/content/aiOpportunity.ts`) | **Done** |
-| `/prototype` | 03 Interactive AI Product Experience | `src/pages/Prototype.tsx` | Placeholder + scaffold harness (proves shared state) |
+| `/prototype` | 03 Interactive AI Product Experience | `src/pages/Prototype.tsx` (content: `src/prototype/content.ts`) | **Done** |
 | `/evaluation` | 04 Evaluation & Safety | `src/pages/Evaluation.tsx` | Placeholder |
 | `/tpm-thinking` | 05 TPM Thinking | `src/pages/TpmThinking.tsx` | Placeholder |
 | `*` | Not found | `src/pages/NotFound.tsx` | Done |
@@ -41,6 +41,8 @@ Single source of truth: `SECTIONS` in `src/content/site.ts`. Header nav, Home in
 **Page 1 (`/problem`) decisions worth remembering:** it uses the framing *Primary User -> Current Workflow -> Pain Points paired with AI Opportunities*. The pain points and opportunities are **proposed framing, not research** (each card is tagged `Proposed`), pairs are 1:1 by construction (`PainOpportunityPair`), and one-line descriptions are qualitative with no statistics (a test asserts no `%`/`Nx` figures appear). The reference image's hero photo and its attributed customer quote were **deliberately not reproduced** (no stock imagery; a quote from "Patent Attorney" would read as real customer research). The hero uses a line-art SVG instead.
 
 **Page 2 (`/ai-opportunity`) decisions worth remembering:** framing is *The opportunity (existing → AI-assisted workflow) → AI Capabilities → How the system works → Why this approach → Product principle*. The five workflow-evolution stages, the five capability cards and the mapping index all share one array (`STAGES` in `aiOpportunity.ts`) so hovering or focusing either side highlights its counterpart by shared index — never the only way to see the pairing, since existing/proposed sit in the same column regardless of hover, and each capability's short description already names what it does. Two deliberate departures from the source brief, both because of standing project rules: **only the single burgundy accent is used** (the brief said "burgundy/indigo," but this project has one accent, and no neon purple/blue), and **the footer note says "any company's internal architecture," not a named company** (the company name never appears in the UI - see section 8).
+
+**Page 3 (`/prototype`) decisions worth remembering:** this is the first page built on the prototype state architecture (section 7), replacing the initial-setup scaffold. It's one **persistent workspace** whose panels populate progressively from `state.step`/`pipeline.status`/`review.decision`, not a step-wizard switching screens - `WorkflowStepper` and `GO_TO_STEP` are deliberately **not** used here (see section 7 for why). The document viewer, evidence list and citation chips in the draft all set the same `activeSourceId`, so clicking any of the three opens the source drawer scoped to that source - the concrete demonstration of "grounded AI." Three departures from the source brief: **in-app product name** is `${SITE.shortName} Workspace` ("IP Assistant Workspace"), not the brief's "Clair Workspace" (too close to the real company name this project keeps out of the UI); the **illustrative quality panel** ("Groundedness 92%," etc.) uses real numbers precisely because the *original* setup brief allows illustrative numbers when clearly labelled - this doesn't reopen `reducer.ts`'s per-item qualitative `Level` type, which is a separate, real piece of state and stays qualitative; **Save/Export are real buttons with an honest inline acknowledgement** ("Saved (illustrative...)"), since nothing in the reducer models persistence or export and pretending otherwise would be dishonest.
 
 Placeholders render `PlaceholderPage` (title, core question, the 7 product questions, pager). Replace a placeholder by building the real page and no longer using `PlaceholderPage` for it.
 
@@ -87,7 +89,7 @@ src/
 
 ## 6. Reusable components
 
-**`components/ui/`**: `Button` (variants `primary|accent|secondary|ghost|danger`, sizes, renders a router `<Link>` when given `to`), `Badge` (tones, optional dot), `IllustrativeTag` (required marker for invented data), `Card` / `CardHeader` (`interactive` for hover lift; `as` for element), `Callout`, `Tabs` (accessible, controlled or not), `Stepper` (presentational; takes statuses), `Spinner` / `Skeleton`, `tones.ts` (shared tone vocabulary).
+**`components/ui/`**: `Button` (variants `primary|accent|secondary|ghost|danger`, sizes, renders a router `<Link>` when given `to`), `Badge` (tones, optional dot), `IllustrativeTag` (required marker for invented data), `Card` / `CardHeader` (`interactive` for hover lift; `as` for element), `Callout`, `Tabs` (accessible, controlled or not), `Disclosure` (native `<details>/<summary>`, free keyboard/screen-reader support - use for any expandable "show more" section), `Stepper` (presentational; takes statuses), `Spinner` / `Skeleton`, `tones.ts` (shared tone vocabulary).
 
 **`components/layout/`**: `Container`, `Section` / `SectionHeading`, `BlockHeading` (compact serif block title + accent rule + optional right-hand note, for blocks inside a page), `PageHeader` (owns the page `h1`; props `aside` = right-hand visual from `md` up, `compact` = tighter padding), `SiteHeader`, `SiteFooter`, `PagePager`, `PlaceholderPage`. Tighten `Section` spacing per page with a className, e.g. `py-6 md:py-8` (`cn` resolves the override).
 
@@ -99,19 +101,21 @@ When a page needs a new pattern used more than once, add it here instead of inli
 
 ## 7. Prototype state and interaction model
 
-One realistic end-to-end workflow, all local mock state.
+One realistic end-to-end workflow, all local mock state, now with a real UI built on `/prototype`.
 
-**Steps (in order):** `select → analyze → retrieve → draft → review → feedback` (`STEP_IDS`, labels in `src/prototype/steps.ts`).
+**Steps (in order):** `select → analyze → retrieve → draft → review → feedback` (`STEP_IDS`, labels in `src/prototype/steps.ts`). **These are reducer bookkeeping, not separate screens** - Page 3 shows one continuous workspace whose panels populate progressively as `state` changes (see below), rather than switching full screens via `GO_TO_STEP`. `WorkflowStepper` (a step-wizard UI) still exists and is still tested, for a future page that wants that pattern; `/prototype` doesn't use it.
 
 **Files (`src/prototype/`):**
-- `types.ts`: domain types and the action union. `Illustrative<T>` marks any invented record with `illustrative: true`.
+- `types.ts`: domain types and the action union. `Illustrative<T>` marks any invented record with `illustrative: true`. `RetrievedSource` has a `category` field (e.g. "Patent Claim", "Prior Art Document", "Prosecution History").
 - `reducer.ts`: **pure** reducer, initial state, and selectors (`selectStepStatus`, `selectDocStatus`, `selectCanStartPipeline`, `selectHasDraft`, `selectHasEdits`, `selectSectionText`). Invalid transitions return the *same state object* (no-op), so the guards in the reducer are the single source of truth.
 - `actions.ts`: `createActions(dispatch)`. Bound helpers that stamp `Date.now()` so the reducer stays pure.
-- `PrototypeContext.ts`, `PrototypeProvider.tsx`, `usePrototype.ts`: context, provider (mounted in `AppLayout`, so **state survives route changes**), hook returning `{ state, actions, dispatch }`.
+- `PrototypeContext.ts`, `PrototypeProvider.tsx`, `usePrototype.ts`: context, provider (mounted in `AppLayout`, so **state survives route changes**), hook returning `{ state, actions, dispatch }`. `Prototype.tsx` is the only place that calls `usePrototype()` directly - every component below it takes plain props, so each is independently testable.
 - `usePipelineRunner.ts`: timer-driven fake AI stages (`parsing → embedding → retrieving → drafting`) that dispatch actions. This is the **seam for a real backend**: replace the `getMockResult` call and the reducer/UI don't change.
-- `mock/seed.ts`: tiny fictional seed data. Replace when the prototype page is designed.
-- `steps.ts`: display copy for steps, stages and document statuses.
-- `components/WorkflowStepper.tsx`: stepper bound to state.
+- `mock/seed.ts`: the fictional scenario - an Office Action rejecting a wearable-sensor-patch claim as obvious over a cited reference, with 3 sources and a 2-section response draft. `OFFICE_ACTION_TEXT.paragraphs` embeds `{{src-1}}`/`{{src-2}}` markers that `DocumentPanel` renders as clickable evidence highlights.
+- `content.ts`: Page 3's workspace copy (sidebar nav, top-bar labels, reject reasons, the illustrative quality-panel rows, the "How this works" flow nodes). Same "content separate from presentation" rule as `src/content/<page>.ts`.
+- `steps.ts`: reducer-value → display mappings: `STEP_META`, `STAGE_LABEL`, `DOC_STATUS_META`, and `CONFIDENCE_TONE` (`Level` → `Tone`: high/medium/low → success/warning/danger).
+- `components/WorkflowStepper.tsx`: step-wizard stepper bound to state (not used on `/prototype`; kept for a future step-wizard page).
+- `components/ProductShell.tsx`, `DocumentPanel.tsx`, `AiAnalysisPanel.tsx`, `SourceDrawer.tsx`, `DraftPanel.tsx`, `RejectFeedbackPanel.tsx`, `QualityPanel.tsx`: the actual workspace UI, described below.
 
 **State shape:** `step`, `reached` (gates navigation; later steps unlock as the workflow progresses), `documentId`, `pipeline {status, stage}`, `sources`, `activeSourceId`, `draft {sections, edits}`, `review {decision, reason}`, `feedback[]`, `audit[]`.
 
@@ -123,9 +127,18 @@ One realistic end-to-end workflow, all local mock state.
 - A decision is final: no second decision, no further edits. `RESET` returns to the start.
 - Ratings are one per section (a new rating replaces the old); comments need text. `audit` records what happened, in order.
 - Document status is **derived** (`selectDocStatus`), never stored.
-- Confidence and relevance are qualitative (`high|medium|low`), not percentages, to avoid fake precision.
+- Confidence and relevance are qualitative (`high|medium|low`), not percentages, to avoid fake precision. This is unrelated to (and doesn't conflict with) `QualityPanel`'s static illustrative numbers - see Page 3's decisions above.
 
 State is in-memory only; a page refresh restarts the workflow.
+
+**The `/prototype` workspace UI**, top to bottom: a compact `PageHeader`, `DisclaimerNote`, a collapsed `Disclosure` "How this works" (reuses `FlowDiagram` horizontal mode), then `ProductShell` - a white, bordered, denser frame inside the ivory page (sidebar nav + top bar), containing:
+- An empty state ("Analyze this document") until a document is selected; one click dispatches `selectDocument` then `startPipeline` in the same handler (two `dispatch` calls in one handler compose correctly against the reducer in order - this is standard `useReducer` behaviour, not a race).
+- While `pipeline.status === 'running'`: `DocumentPanel` (visible immediately) plus a stage-label + `Spinner` in place of the analysis/draft panels.
+- Once the draft exists: `DocumentPanel` + `AiAnalysisPanel` (left), `DraftPanel` + `QualityPanel` (right), stacking to one column below `xl`.
+- A `useEffect` in `Prototype.tsx` calls `actions.beginReview()` as soon as the draft exists (idempotent per the reducer), so Approve/Reject work without a separate "begin review" step - the status badge reads "In expert review" essentially as soon as the draft appears, not the more transient `draft_ready`.
+- `SourceDrawer` is a sibling overlay (right panel at `lg+`, bottom sheet below `lg`), opened by a page-local `sourcesOpen` boolean; every source reference (document highlight, evidence-list row, draft citation chip, drawer item) calls the same `setActiveSource`, which is how grounding is demonstrated - clicking any of them opens the same drawer scoped to the same source.
+- `DraftPanel`'s Edit toggles a **local** `isEditing` boolean (not reducer state) that swaps each section's text for a `<textarea>` bound to `selectSectionText`/`editSection` - edits autosave on every change, no explicit save action needed.
+- Rejecting opens `RejectFeedbackPanel` inline (also local state, uncommitted) with the 5 reasons + "Other"; only Submit dispatches `actions.reject(reason)`.
 
 ## 8. Important assumptions
 
@@ -135,6 +148,8 @@ State is in-memory only; a page refresh restarts the workflow.
 - No backend and no real LLM calls unless explicitly requested.
 - Home is provisional. Any page can be replaced when its design prompt arrives.
 - Desktop first, but every page must work at about 390px wide.
+- `src/test/setup.ts` stubs a couple of DOM APIs jsdom doesn't implement (`window.scrollTo`, `Element.prototype.scrollIntoView`) - components are free to use real scrolling behaviour; add a stub here if a future component hits another missing jsdom API rather than avoiding the API.
+- An `AGENTS.md` may appear at the repo root as a stale auto-generated mirror of an earlier `CLAUDE.md` snapshot. It is not maintained - `CLAUDE.md` is the source of truth. Don't read it for current guidance, and don't update it in place of `CLAUDE.md`.
 
 ## 9. Rules for implementing future pages
 

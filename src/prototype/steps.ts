@@ -1,5 +1,5 @@
 import type { Tone } from '@/components/ui/tones'
-import type { DocStatus, PipelineStage, StepId } from './types'
+import type { DocStatus, Level, PipelineStage, StepId } from './types'
 
 /** Display copy for the workflow steps. Placeholder wording; the prototype page prompt will refine it. */
 export const STEP_META: Record<StepId, { label: string; description: string }> = {
@@ -16,6 +16,13 @@ export const STAGE_LABEL: Record<PipelineStage, string> = {
   embedding: 'Indexing passages',
   retrieving: 'Retrieving relevant evidence',
   drafting: 'Drafting with citations',
+}
+
+/** Display tone for a qualitative confidence/relevance level. Matches the semantic meaning of each tone. */
+export const CONFIDENCE_TONE: Record<Level, Tone> = {
+  high: 'success',
+  medium: 'warning',
+  low: 'danger',
 }
 
 export const DOC_STATUS_META: Record<DocStatus, { label: string; tone: Tone }> = {

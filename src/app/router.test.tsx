@@ -28,7 +28,7 @@ describe('routing', () => {
   // necessarily contain the nav title verbatim - just assert an h1 renders. Placeholder pages
   // still render `section.title` as their h1, so match it by regex (a page may prefix its own
   // numbering, e.g. "1. Understanding the Problem").
-  const CUSTOM_HEADING_SECTIONS: readonly string[] = ['problem', 'ai-opportunity']
+  const CUSTOM_HEADING_SECTIONS: readonly string[] = ['problem', 'ai-opportunity', 'prototype']
   it.each(SECTIONS.map((s) => [s.id, s.path, s.title] as const))('renders %s', async (id, path, title) => {
     renderAt(path)
     if (CUSTOM_HEADING_SECTIONS.includes(id)) {
@@ -113,40 +113,42 @@ describe('routing', () => {
 })
 
 describe('prototype state is shared across routes', () => {
-  it('keeps the selected document after navigating away and back', async () => {
+  it('keeps the analyzed draft after navigating away and back', async () => {
     const user = userEvent.setup()
     renderAt('/prototype')
-    await screen.findByRole('heading', { level: 1, name: /Interactive AI Product Experience/ })
+    await screen.findByRole('heading', { level: 1, name: /expert-validated output/i })
 
-    expect(screen.getByText('None selected')).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: /select example document/i }))
-    expect(screen.getByText(/Adaptive wearable sensor patch/)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /analyze this document/i })).toBeInTheDocument()
+    vi.useFakeTimers()
+    fireEvent.click(screen.getByRole('button', { name: /analyze this document/i }))
+    for (const stage of PIPELINE_STAGES) {
+      act(() => {
+        vi.advanceTimersByTime(STAGE_DURATION_MS[stage])
+      })
+    }
+    expect(screen.getByRole('heading', { level: 2, name: 'Draft Response' })).toBeInTheDocument()
+    vi.useRealTimers()
 
     await user.click(within(desktopNav()).getByRole('link', { name: /problem/i }))
     await screen.findByRole('heading', { level: 1, name: /Understanding the Problem/ })
 
     await user.click(within(desktopNav()).getByRole('link', { name: /prototype/i }))
-    await screen.findByRole('heading', { level: 1, name: /Interactive AI Product Experience/ })
-    expect(screen.getByText(/Adaptive wearable sensor patch/)).toBeInTheDocument()
-
-    await user.click(screen.getByRole('button', { name: /reset/i }))
-    expect(screen.getByText('None selected')).toBeInTheDocument()
+    await screen.findByRole('heading', { level: 1, name: /expert-validated output/i })
+    expect(screen.getByRole('heading', { level: 2, name: 'Draft Response' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /analyze this document/i })).not.toBeInTheDocument()
   })
 
-  it('runs the simulated pipeline to completion and keeps locked steps locked', async () => {
-    const user = userEvent.setup()
+  it('runs the simulated pipeline to completion and reveals the evidence and draft', async () => {
     renderAt('/prototype')
-    await screen.findByRole('heading', { level: 1, name: /Interactive AI Product Experience/ })
-    await user.click(screen.getByRole('button', { name: /select example document/i }))
+    await screen.findByRole('heading', { level: 1, name: /expert-validated output/i })
 
-    // Review is locked until the draft exists and review begins.
-    const stepper = screen.getByRole('navigation', { name: 'Prototype workflow' })
-    expect(within(stepper).queryByRole('button', { name: /expert review/i })).not.toBeInTheDocument()
+    // Before analysis: no evidence, no draft yet.
+    expect(screen.queryByText('Relevant evidence')).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { level: 2, name: 'Draft Response' })).not.toBeInTheDocument()
 
-    // Fake timers only after the async route loading is done.
     vi.useFakeTimers()
-    fireEvent.click(screen.getByRole('button', { name: /run ai pipeline/i }))
-    expect(screen.getByText('AI processing')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /analyze this document/i }))
+    expect(screen.getByText(/AI processing/i)).toBeInTheDocument()
 
     for (const stage of PIPELINE_STAGES) {
       act(() => {
@@ -154,9 +156,8 @@ describe('prototype state is shared across routes', () => {
       })
     }
 
-    expect(screen.getByText('Draft ready')).toBeInTheDocument()
-    expect(screen.getByText('3 sources')).toBeInTheDocument()
-    expect(within(stepper).getByRole('button', { name: /evidence/i })).toBeInTheDocument()
-    expect(within(stepper).queryByRole('button', { name: /expert review/i })).not.toBeInTheDocument()
+    expect(screen.getByText('Relevant evidence')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2, name: 'Draft Response' })).toBeInTheDocument()
+    expect(screen.getByText(/3 source documents/i)).toBeInTheDocument()
   })
 })
