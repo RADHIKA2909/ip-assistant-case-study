@@ -34,15 +34,25 @@ export function SiteHeader() {
     return () => window.removeEventListener('keydown', onKey)
   }, [open])
 
-  const renderItems = (linkClass: typeof desktopLink, itemClass?: string) =>
-    SECTIONS.map((section) => (
-      <li key={section.id} className={itemClass}>
-        <NavLink to={section.path} className={linkClass} onClick={() => setOpen(false)}>
-          <span className="font-mono text-caption text-ink-subtle">{section.number}</span>
-          {section.shortTitle}
+  const renderItems = (linkClass: typeof desktopLink) => (
+    <>
+      <li>
+        {/* `end` so this doesn't read as "active" on every route - NavLink otherwise matches
+            any path starting with "/". */}
+        <NavLink to="/" end className={linkClass} onClick={() => setOpen(false)}>
+          Overview
         </NavLink>
       </li>
-    ))
+      {SECTIONS.map((section) => (
+        <li key={section.id}>
+          <NavLink to={section.path} className={linkClass} onClick={() => setOpen(false)}>
+            <span className="font-mono text-caption text-ink-subtle">{section.number}</span>
+            {section.shortTitle}
+          </NavLink>
+        </li>
+      ))}
+    </>
+  )
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-canvas/85 backdrop-blur">

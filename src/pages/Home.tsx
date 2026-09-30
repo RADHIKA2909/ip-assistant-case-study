@@ -29,7 +29,9 @@ export function Home() {
 
       <section className="border-b border-border">
         <Container className="grid gap-12 py-12 md:py-20 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:gap-16">
-          <div>
+          {/* Same animate-rise entrance every other page gets for free via PageHeader - Home
+              builds its own hero, so it needs the stagger applied explicitly. */}
+          <div className="animate-rise">
             <div className="flex flex-wrap items-center gap-2">
               <Badge tone="accent">Product case study</Badge>
               <IllustrativeTag label="Proposed" />
@@ -56,7 +58,13 @@ export function Home() {
             <PrincipleCallout className="mt-10" />
           </div>
 
-          <Card as="section" padding="lg" aria-labelledby="core-story-title" className="self-start">
+          <Card
+            as="section"
+            padding="lg"
+            aria-labelledby="core-story-title"
+            className="animate-rise self-start"
+            style={{ animationDelay: '120ms' }}
+          >
             <CardHeader
               headingLevel="h2"
               eyebrow="How it works"
@@ -77,7 +85,7 @@ export function Home() {
         </Container>
       </section>
 
-      <Section aria-labelledby="parts-title">
+      <Section aria-labelledby="parts-title" className="animate-rise" style={{ animationDelay: '200ms' }}>
         <SectionHeading
           id="parts-title"
           eyebrow="Five parts"

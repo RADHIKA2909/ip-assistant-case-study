@@ -32,7 +32,7 @@ export function GuardrailGrid({ items, label, highlightedIds, onHover }: Guardra
               onFocus={() => onHover(item.id)}
               onBlur={() => onHover(null)}
               className={cn(
-                'h-full outline-none transition-colors duration-200 ease-soft',
+                'h-full transition-colors duration-200 ease-soft',
                 active && 'border-accent-border bg-accent-soft/40',
               )}
             >

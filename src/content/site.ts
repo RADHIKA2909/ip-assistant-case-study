@@ -53,7 +53,7 @@ export const SECTIONS: readonly Section[] = [
     path: '/ai-opportunity',
     number: '02',
     title: 'AI Product Opportunity',
-    shortTitle: 'Opportunity',
+    shortTitle: 'AI Opportunity',
     summary:
       'Where retrieval, reasoning and drafting genuinely help, and where a human must stay in the loop.',
     question: 'Where can AI genuinely help, and where should it never act alone?',
@@ -63,7 +63,7 @@ export const SECTIONS: readonly Section[] = [
     path: '/prototype',
     number: '03',
     title: 'Interactive AI Product Experience',
-    shortTitle: 'Prototype',
+    shortTitle: 'Product',
     summary:
       'One end-to-end workflow: analyse a document, inspect the evidence, then approve, edit or reject the draft.',
     question: 'What does an evidence-grounded, expert-reviewed AI workflow feel like end to end?',
@@ -83,7 +83,7 @@ export const SECTIONS: readonly Section[] = [
     path: '/tpm-thinking',
     number: '05',
     title: 'TPM Thinking',
-    shortTitle: 'TPM thinking',
+    shortTitle: 'TPM Thinking',
     summary:
       'How a technical product manager would scope, sequence, prioritise and measure this product.',
     question: 'How would a TPM scope, sequence and measure this product?',

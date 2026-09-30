@@ -99,4 +99,8 @@ export const PRODUCT_PRINCIPLE = 'AI assists. Evidence grounds. Expert decides.'
 export const SAVE_CONFIRMATION = 'Saved (illustrative — this prototype keeps no data)'
 export const EXPORT_NOTE = 'Export is illustrative and not implemented in this prototype.'
 
+/** Footer note - same "proposed, illustrative" pattern used on every other page's footer. */
+export const PROTOTYPE_NOTE =
+  "Proposed interactive prototype using illustrative, fictional data — not any company's actual product, architecture or results."
+
 export const ANALYZE_CTA = 'Analyze this document'

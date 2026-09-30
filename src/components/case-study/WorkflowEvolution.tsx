@@ -71,7 +71,7 @@ export function WorkflowEvolution({
               onMouseLeave={() => onActiveChange(null)}
               onFocus={() => onActiveChange(index)}
               onBlur={() => onActiveChange(null)}
-              className="flex flex-col items-center gap-2 rounded-lg px-1 py-2 text-center outline-none"
+              className="flex flex-col items-center gap-2 rounded-lg px-1 py-2 text-center"
             >
               <span
                 className={cn(

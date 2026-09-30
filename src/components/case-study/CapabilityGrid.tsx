@@ -46,7 +46,7 @@ export function CapabilityGrid({ items, label, activeIndex, onActiveChange, clas
               onFocus={() => onActiveChange(index)}
               onBlur={() => onActiveChange(null)}
               className={cn(
-                'h-full outline-none transition-colors duration-200 ease-soft',
+                'h-full transition-colors duration-200 ease-soft',
                 active && 'border-accent-border bg-accent-soft/40',
               )}
             >

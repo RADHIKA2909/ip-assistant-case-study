@@ -29,7 +29,7 @@ export function RiskList({ items, label }: RiskListProps) {
           <li
             key={item.id}
             tabIndex={0}
-            className="group grid gap-3 rounded-xl border border-border bg-surface p-4 outline-none transition-colors duration-200 ease-soft hover:border-border-strong hover:bg-surface-subtle focus-visible:border-border-strong focus-visible:bg-surface-subtle sm:p-5 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:items-center lg:gap-4"
+            className="group grid gap-3 rounded-xl border border-border bg-surface p-4 transition-colors duration-200 ease-soft hover:border-border-strong hover:bg-surface-subtle focus-visible:border-border-strong focus-visible:bg-surface-subtle sm:p-5 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:items-center lg:gap-4"
           >
             <div className="flex items-center gap-2.5">
               <span

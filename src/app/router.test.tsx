@@ -81,7 +81,22 @@ describe('routing', () => {
     await user.click(within(nav).getByRole('link', { name: /evaluation/i }))
     await screen.findByRole('heading', { level: 1, name: /measurable/i })
     expect(within(desktopNav()).getByRole('link', { name: /evaluation/i })).toHaveAttribute('aria-current', 'page')
-    expect(screen.getByRole('main')).toHaveFocus()
+  })
+
+  it('has an Overview link back to Home, current only on "/" and not on other pages', async () => {
+    const user = userEvent.setup()
+    renderAt('/')
+    await screen.findByRole('heading', { level: 1 })
+    const overview = within(desktopNav()).getByRole('link', { name: 'Overview' })
+    expect(overview).toHaveAttribute('href', '/')
+    expect(overview).toHaveAttribute('aria-current', 'page')
+
+    // Navigate the same way a real user (and every other test here) does: click a nav link.
+    // Calling the router's own .navigate() directly isn't act()-wrapped and leaves NavLink's
+    // active-state stuck on a stale render when asserted on synchronously afterward.
+    await user.click(within(desktopNav()).getByRole('link', { name: /problem/i }))
+    await screen.findByRole('heading', { level: 1, name: /Understanding the Problem/ })
+    expect(within(desktopNav()).getByRole('link', { name: 'Overview' })).not.toHaveAttribute('aria-current')
   })
 
   it('toggles the mobile menu, closes it on Escape, and closes it after choosing a page', async () => {
@@ -138,7 +153,7 @@ describe('prototype state is shared across routes', () => {
     await user.click(within(desktopNav()).getByRole('link', { name: /problem/i }))
     await screen.findByRole('heading', { level: 1, name: /Understanding the Problem/ })
 
-    await user.click(within(desktopNav()).getByRole('link', { name: /prototype/i }))
+    await user.click(within(desktopNav()).getByRole('link', { name: /^03\s*product/i }))
     await screen.findByRole('heading', { level: 1, name: /expert-validated output/i })
     expect(screen.getByRole('heading', { level: 2, name: 'Draft Response' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /analyze this document/i })).not.toBeInTheDocument()

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { ContextNote } from '@/components/case-study/ContextNote'
 import { DisclaimerNote } from '@/components/case-study/DisclaimerNote'
 import { FlowDiagram } from '@/components/case-study/FlowDiagram'
 import { PageHeader } from '@/components/layout/PageHeader'
@@ -21,6 +22,7 @@ import {
   HOW_IT_WORKS_LABEL,
   HOW_IT_WORKS_NODES,
   PRODUCT_PRINCIPLE,
+  PROTOTYPE_NOTE,
   SAVE_CONFIRMATION,
   TOP_BAR,
 } from '@/prototype/content'
@@ -188,6 +190,7 @@ export function Prototype() {
       </Section>
 
       <Section tone="subtle" className="py-6 md:py-8">
+        <ContextNote className="mb-6">{PROTOTYPE_NOTE}</ContextNote>
         <PagePager sectionId="prototype" />
       </Section>
     </>

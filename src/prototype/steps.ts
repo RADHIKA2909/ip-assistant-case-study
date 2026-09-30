@@ -30,7 +30,7 @@ export const DOC_STATUS_META: Record<DocStatus, { label: string; tone: Tone }> =
   ai_processing: { label: 'AI processing', tone: 'accent' },
   draft_ready: { label: 'Draft ready', tone: 'accent' },
   in_review: { label: 'In expert review', tone: 'warning' },
-  approved: { label: 'Approved', tone: 'success' },
-  edited: { label: 'Approved with edits', tone: 'success' },
-  rejected: { label: 'Rejected', tone: 'danger' },
+  approved: { label: 'Expert Approved', tone: 'success' },
+  edited: { label: 'Expert Approved (edited)', tone: 'success' },
+  rejected: { label: 'Revision Required', tone: 'danger' },
 }

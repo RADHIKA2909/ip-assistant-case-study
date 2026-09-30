@@ -39,7 +39,7 @@ export function FailureModeList({ items, guardrails, label, highlightedIds, onHo
             onFocus={() => onHover(item.id)}
             onBlur={() => onHover(null)}
             className={cn(
-              'grid gap-3 rounded-xl border border-border bg-surface p-4 outline-none transition-colors duration-200 ease-soft sm:p-5 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto] lg:items-center lg:gap-4',
+              'grid gap-3 rounded-xl border border-border bg-surface p-4 transition-colors duration-200 ease-soft sm:p-5 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto] lg:items-center lg:gap-4',
               active && 'border-border-strong bg-surface-subtle',
             )}
           >
