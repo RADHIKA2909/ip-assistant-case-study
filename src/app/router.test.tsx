@@ -28,7 +28,13 @@ describe('routing', () => {
   // necessarily contain the nav title verbatim - just assert an h1 renders. Placeholder pages
   // still render `section.title` as their h1, so match it by regex (a page may prefix its own
   // numbering, e.g. "1. Understanding the Problem").
-  const CUSTOM_HEADING_SECTIONS: readonly string[] = ['problem', 'ai-opportunity', 'prototype', 'evaluation']
+  const CUSTOM_HEADING_SECTIONS: readonly string[] = [
+    'problem',
+    'ai-opportunity',
+    'prototype',
+    'evaluation',
+    'tpm-thinking',
+  ]
   it.each(SECTIONS.map((s) => [s.id, s.path, s.title] as const))('renders %s', async (id, path, title) => {
     renderAt(path)
     if (CUSTOM_HEADING_SECTIONS.includes(id)) {
