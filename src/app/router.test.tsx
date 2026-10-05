@@ -72,7 +72,8 @@ describe('routing', () => {
 
     const nav = desktopNav()
     for (const section of SECTIONS) {
-      expect(within(nav).getByRole('link', { name: new RegExp(section.shortTitle, 'i') })).toHaveAttribute(
+      // Anchored: "Product" is now a substring of "AI Product Opportunity", so an unanchored match is ambiguous.
+      expect(within(nav).getByRole('link', { name: new RegExp(`^${section.number}\\s*${section.shortTitle}$`, 'i') })).toHaveAttribute(
         'href',
         section.path,
       )

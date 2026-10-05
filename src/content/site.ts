@@ -15,7 +15,7 @@ export const SITE = {
   tagline: 'A proposed AI product concept for document-heavy patent and IP workflows',
   principle: 'AI should assist the professional, not blindly replace expert judgment.',
   disclaimer:
-    'Independent case study of a proposed product concept. Workflows, architecture, data and metrics shown here are illustrative and are not the implementation of any company.',
+    "Independent case study of a proposed product concept. Workflows, architecture, data and metrics shown here are illustrative and do not represent any company's actual implementation.",
 } as const
 
 export function pageTitle(part?: string) {
@@ -53,7 +53,7 @@ export const SECTIONS: readonly Section[] = [
     path: '/ai-opportunity',
     number: '02',
     title: 'AI Product Opportunity',
-    shortTitle: 'AI Opportunity',
+    shortTitle: 'AI Product Opportunity',
     summary:
       'Where retrieval, reasoning and drafting genuinely help, and where a human must stay in the loop.',
     question: 'Where can AI genuinely help, and where should it never act alone?',
@@ -139,51 +139,55 @@ export const CORE_STORY: readonly CoreStoryStep[] = [
     actor: 'input',
   },
   {
-    id: 'understanding',
-    label: 'Retrieval & understanding',
-    description: 'Find what matters in the document instead of reading all of it.',
+    id: 'ingestion',
+    label: 'Document ingestion & indexing',
+    description:
+      'Documents are uploaded, processed and prepared so the system can search them efficiently.',
     actor: 'ai',
   },
   {
     id: 'rag',
-    label: 'Knowledge retrieval (RAG)',
-    description: 'Ground every answer in retrieved passages, not model memory.',
+    label: 'Retrieval & context grounding (RAG)',
+    description:
+      'When the professional asks something, the system finds the most relevant passages and gives them to the AI as context.',
     actor: 'ai',
   },
   {
     id: 'reasoning',
     label: 'Reasoning & agentic workflow',
-    description: 'Break the task into steps the system can check and explain.',
+    description:
+      'AI analyzes the retrieved information and breaks the task into steps when needed.',
     actor: 'ai',
   },
   {
     id: 'draft',
     label: 'Structured draft or recommendation',
-    description: 'A usable first draft, not a wall of text.',
+    description: 'AI produces a useful draft or recommendation rather than a wall of text.',
     actor: 'ai',
   },
   {
     id: 'evidence',
     label: 'Evidence & citations',
-    description: 'Every claim links to the passage that supports it.',
+    description: 'The professional can see the source passages supporting the AI’s claims.',
     actor: 'ai',
   },
   {
     id: 'review',
     label: 'Expert review',
-    description: 'A professional inspects the evidence and owns the judgment.',
+    description: 'The patent professional reviews the output and its evidence.',
     actor: 'human',
   },
   {
     id: 'decision',
     label: 'Approve, edit or reject',
-    description: 'The expert decides. Nothing ships without this step.',
+    description: 'The expert makes the final decision.',
     actor: 'human',
   },
   {
     id: 'feedback',
     label: 'Feedback & continuous improvement',
-    description: 'Decisions and edits become signals for evaluating and improving the system.',
+    description:
+      'Those decisions and edits become signals for improving and evaluating the system.',
     actor: 'loop',
   },
 ]

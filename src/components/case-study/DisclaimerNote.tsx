@@ -7,7 +7,7 @@ import { Callout } from '@/components/ui/Callout'
 export function DisclaimerNote({ className }: { className?: string }) {
   return (
     <Callout tone="neutral" title="Proposed concept, illustrative data" className={className}>
-      Everything here is a design proposal with made-up example data. It does not describe any
+      Everything here is a design proposal using illustrative example data. It does not describe any
       company&rsquo;s actual product, architecture or results.
     </Callout>
   )
