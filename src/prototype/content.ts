@@ -37,11 +37,15 @@ export const TOP_BAR = {
 } as const
 
 export const KEY_FINDING = {
-  label: 'Key finding',
-  text: 'The examiner has raised an obviousness objection relating to the claimed sensor assembly, citing a reference with a rigid housing and a single motion sensor.',
+  label: 'AI Key Finding',
+  text: 'The existing reference measures how much water remains in the bottle. Claim 1 focuses on tracking how much water the user actually drinks. The AI identifies this as the key difference.',
 } as const
 
-export const EVIDENCE_LABEL = 'Relevant evidence'
+export const EVIDENCE_LABEL = 'Relevant Evidence'
+
+/** The "Why this answer?" explanation, shown above the list of sources behind the response. */
+export const WHY_THIS_ANSWER_TEXT =
+  'The AI compared the company’s claim with the cited prior-art reference and identified the difference between measuring water remaining and tracking water consumed.'
 export const VIEW_SOURCES_LABEL = 'View Sources'
 export const OPEN_SOURCE_LABEL = 'Open source'
 export const WHY_THIS_ANSWER_LABEL = 'Why this answer?'
@@ -69,6 +73,8 @@ export interface QualityRow {
   id: string
   label: string
   value: string
+  /** Plain-English explanation of what the number means. */
+  help: string
 }
 
 /**
@@ -78,9 +84,24 @@ export interface QualityRow {
  * never presented as a real measurement.
  */
 export const QUALITY_ROWS: readonly QualityRow[] = [
-  { id: 'groundedness', label: 'Groundedness', value: '92%' },
-  { id: 'coverage', label: 'Source coverage', value: '4 / 5 key claims supported' },
-  { id: 'review', label: 'Expert review', value: 'Required' },
+  {
+    id: 'groundedness',
+    label: 'Groundedness',
+    value: '92%',
+    help: 'How much of the AI response is supported by the available source documents.',
+  },
+  {
+    id: 'coverage',
+    label: 'Source coverage',
+    value: '4 / 5 key claims supported',
+    help: 'How many important statements in the AI response have supporting evidence.',
+  },
+  {
+    id: 'review',
+    label: 'Expert review',
+    value: 'Required',
+    help: 'The patent professional must review the AI output before it is used.',
+  },
 ]
 
 export const HOW_IT_WORKS_LABEL = 'How this works'

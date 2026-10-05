@@ -45,7 +45,7 @@ describe('Prototype page', () => {
 
     expect(screen.queryByRole('button', { name: /analyze this document/i })).not.toBeInTheDocument()
     expect(screen.getByRole('heading', { level: 2, name: 'Draft Response' })).toBeInTheDocument()
-    expect(screen.getByText('Relevant evidence')).toBeInTheDocument()
+    expect(screen.getByText('Relevant Evidence')).toBeInTheDocument()
     // The expert "opens" review as soon as the draft is in front of them (see Prototype.tsx),
     // so the status badge reads "In expert review" here, not the transient "Draft ready".
     expect(screen.getAllByText('In expert review').length).toBeGreaterThan(0)
@@ -58,9 +58,9 @@ describe('Prototype page', () => {
 
     await user.click(screen.getByRole('button', { name: /view sources/i }))
     const drawer = screen.getByRole('dialog', { name: /view sources/i })
-    expect(within(drawer).getByText('Patent Claim')).toBeInTheDocument()
-    expect(within(drawer).getByText('Prior Art Document')).toBeInTheDocument()
-    expect(within(drawer).getByText('Prosecution History')).toBeInTheDocument()
+    expect(within(drawer).getByText("Company’s claim")).toBeInTheDocument()
+    expect(within(drawer).getByText('Existing reference')).toBeInTheDocument()
+    expect(within(drawer).getByText('Examiner objection')).toBeInTheDocument()
 
     await user.keyboard('{Escape}')
     expect(screen.queryByRole('dialog', { name: /view sources/i })).not.toBeInTheDocument()
@@ -72,11 +72,11 @@ describe('Prototype page', () => {
     await analyze()
 
     // The document panel highlights the claim language as a clickable span.
-    const highlight = screen.getByRole('button', { name: /wearable sensor patch comprising/i })
+    const highlight = screen.getByRole('button', { name: /smart water bottle that tracks/i })
     await user.click(highlight)
 
     const drawer = await screen.findByRole('dialog', { name: /view sources/i })
-    expect(within(drawer).getByText('Claim 1 (as filed)')).toBeInTheDocument()
+    expect(within(drawer).getByText('Claim 1 — Company’s claim')).toBeInTheDocument()
   })
 
   it('lets the expert edit a section, then approve with edits applied', async () => {
@@ -85,7 +85,7 @@ describe('Prototype page', () => {
     await analyze()
 
     await user.click(screen.getByRole('button', { name: /^edit$/i }))
-    const textarea = screen.getByRole('textbox', { name: /Response to the obviousness rejection/i })
+    const textarea = screen.getByRole('textbox', { name: /Response to the examiner/i })
     await user.clear(textarea)
     await user.type(textarea, 'Expert-rewritten response text.')
     expect(screen.getByDisplayValue('Expert-rewritten response text.')).toBeInTheDocument()

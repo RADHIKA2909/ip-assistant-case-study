@@ -13,7 +13,10 @@ export function QualityPanel() {
       <dl className="mt-3 space-y-3">
         {QUALITY_ROWS.map((row) => (
           <div key={row.id} className="flex items-center justify-between gap-3 border-t border-border pt-3 first:border-t-0 first:pt-0">
-            <dt className="text-small text-ink-muted">{row.label}</dt>
+            <dt className="min-w-0">
+              <span className="block text-small text-ink-muted">{row.label}</span>
+              <span className="mt-0.5 block text-caption text-ink-subtle">{row.help}</span>
+            </dt>
             <dd className="flex items-center gap-2 text-small font-semibold text-ink">
               {row.value}
               <IllustrativeTag />

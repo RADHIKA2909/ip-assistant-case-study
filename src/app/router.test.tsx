@@ -165,7 +165,7 @@ describe('prototype state is shared across routes', () => {
     await screen.findByRole('heading', { level: 1, name: /expert-validated output/i })
 
     // Before analysis: no evidence, no draft yet.
-    expect(screen.queryByText('Relevant evidence')).not.toBeInTheDocument()
+    expect(screen.queryByText('Relevant Evidence')).not.toBeInTheDocument()
     expect(screen.queryByRole('heading', { level: 2, name: 'Draft Response' })).not.toBeInTheDocument()
 
     vi.useFakeTimers()
@@ -178,7 +178,7 @@ describe('prototype state is shared across routes', () => {
       })
     }
 
-    expect(screen.getByText('Relevant evidence')).toBeInTheDocument()
+    expect(screen.getByText('Relevant Evidence')).toBeInTheDocument()
     expect(screen.getByRole('heading', { level: 2, name: 'Draft Response' })).toBeInTheDocument()
     expect(screen.getByText(/3 source documents/i)).toBeInTheDocument()
   })

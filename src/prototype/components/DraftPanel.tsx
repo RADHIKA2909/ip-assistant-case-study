@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/Button'
 import { Callout } from '@/components/ui/Callout'
 import { Card, CardHeader } from '@/components/ui/Card'
 import { Disclosure } from '@/components/ui/Disclosure'
-import { DRAFT_DISCLAIMER, WHY_THIS_ANSWER_LABEL } from '../content'
+import { IllustrativeTag } from '@/components/ui/IllustrativeTag'
+import { DRAFT_DISCLAIMER, WHY_THIS_ANSWER_LABEL, WHY_THIS_ANSWER_TEXT } from '../content'
 import { CONFIDENCE_TONE, DOC_STATUS_META } from '../steps'
 import type { DocStatus, DraftSection, ReviewDecision, RetrievedSource } from '../types'
 import { RejectFeedbackPanel } from './RejectFeedbackPanel'
@@ -68,9 +69,12 @@ export function DraftPanel({
           <div key={section.id} className="border-t border-border pt-4 first:border-t-0 first:pt-0">
             <div className="flex items-start justify-between gap-3">
               <h3 className="text-small font-semibold text-ink">{section.heading}</h3>
-              <Badge tone={CONFIDENCE_TONE[section.confidence]} className="shrink-0">
-                {section.confidence} confidence
-              </Badge>
+              <div className="flex shrink-0 items-center gap-1.5">
+                <Badge tone={CONFIDENCE_TONE[section.confidence]}>
+                  {section.confidence} confidence
+                </Badge>
+                <IllustrativeTag />
+              </div>
             </div>
 
             {isEditing ? (
@@ -96,13 +100,14 @@ export function DraftPanel({
                     onClick={() => onSelectSource(id)}
                     className="cursor-pointer rounded-full border border-border-strong bg-surface-subtle px-2 py-0.5 font-mono text-caption text-ink-muted hover:bg-surface"
                   >
-                    [{source.label}]
+                    [{source.citationLabel}]
                   </button>
                 )
               })}
             </div>
 
             <Disclosure summary={WHY_THIS_ANSWER_LABEL} className="mt-2">
+              <p className="mb-2 text-caption text-ink-muted">{WHY_THIS_ANSWER_TEXT}</p>
               <ul className="space-y-1.5">
                 {section.sourceIds.map((id) => {
                   const source = sources.find((s) => s.id === id)

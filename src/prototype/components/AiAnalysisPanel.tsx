@@ -2,6 +2,7 @@ import { ChevronRight, Sparkles } from 'lucide-react'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
+import { IllustrativeTag } from '@/components/ui/IllustrativeTag'
 import { cn } from '@/lib/cn'
 import { EVIDENCE_LABEL, KEY_FINDING, VIEW_SOURCES_LABEL } from '../content'
 import { CONFIDENCE_TONE } from '../steps'
@@ -30,7 +31,10 @@ export function AiAnalysisPanel({ sources, activeSourceId, onSelectSource, onVie
       </div>
 
       <div className="mt-4 border-t border-border pt-4">
-        <p className="text-overline text-ink-subtle uppercase">{EVIDENCE_LABEL}</p>
+        <div className="flex items-center gap-2">
+          <p className="text-overline text-ink-subtle uppercase">{EVIDENCE_LABEL}</p>
+          <IllustrativeTag />
+        </div>
         <ul className="mt-2 space-y-1.5">
           {sources.map((source) => {
             const active = activeSourceId === source.id
