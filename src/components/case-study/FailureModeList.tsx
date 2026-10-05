@@ -17,11 +17,12 @@ interface FailureModeListProps {
  * accent-for-problem convention); expected behaviour uses the success tint. The related-guardrail
  * caption is always visible text, not hover-only - hover/focus is only an added cross-highlight
  * with GuardrailGrid via `highlightedIds` (computed by the page, not always 1:1 - see CLAUDE.md).
- * Desktop: aligned grid rows. Below `lg`: stacked cards.
+ * Desktop: one shared column track on the list, inherited by each row via subgrid, so the arrows
+ * line up vertically whatever the length of each failure title. Below `lg`: stacked cards.
  */
 export function FailureModeList({ items, guardrails, label, highlightedIds, onHover }: FailureModeListProps) {
   return (
-    <ol aria-label={label} className="flex flex-col gap-3">
+    <ol aria-label={label} className="flex flex-col gap-3 lg:grid lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto] lg:gap-x-4">
       {items.map((item) => {
         const Icon = item.icon
         const active = highlightedIds.has(item.id)
@@ -39,7 +40,7 @@ export function FailureModeList({ items, guardrails, label, highlightedIds, onHo
             onFocus={() => onHover(item.id)}
             onBlur={() => onHover(null)}
             className={cn(
-              'grid gap-3 rounded-xl border border-border bg-surface p-4 transition-colors duration-200 ease-soft sm:p-5 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto] lg:items-center lg:gap-4',
+              'grid gap-3 rounded-xl border border-border bg-surface p-4 transition-colors duration-200 ease-soft sm:p-5 lg:col-span-full lg:grid-cols-subgrid lg:items-center lg:gap-x-4',
               active && 'border-border-strong bg-surface-subtle',
             )}
           >
